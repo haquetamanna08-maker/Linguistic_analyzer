@@ -1,4 +1,6 @@
-Flask
+flask
 textblob
 textstat
+nltk
 gunicorn
+langdetect
