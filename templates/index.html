@@ -2,41 +2,51 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Linguistic Marketing Analyzer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketing Content Analyzer</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; margin: 0; padding: 40px; }
-        .card { max-width: 650px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h2 { color: #333; margin-top: 0; }
-        textarea { width: 100%; height: 120px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
-        button { background-color: #007bff; color: white; border: none; padding: 12px 20px; font-size: 15px; border-radius: 6px; cursor: pointer; margin-top: 10px; width: 100%; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #333; }
+        h1 { color: #2c3e50; text-align: center; }
+        textarea { width: 100%; height: 140px; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
+        button { background-color: #007bff; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; margin-top: 10px; width: 100%; }
         button:hover { background-color: #0056b3; }
-        .results { margin-top: 25px; background: #eef2f7; padding: 20px; border-radius: 8px; border-left: 5px solid #007bff; }
-        .metric { margin-bottom: 10px; font-size: 15px; }
+        .results-box { margin-top: 30px; padding: 20px; border-radius: 8px; background-color: #f8f9fa; border: 1px solid #dee2e6; }
+        .result-item { margin-bottom: 15px; }
+        .tip { font-style: italic; color: #6c757d; font-size: 0.95rem; margin-top: 2px; }
+        footer { margin-top: 50px; padding: 20px 0; text-align: center; font-size: 0.9rem; color: #6c757d; border-top: 1px solid #e9ecef; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>Linguistic & Sentiment Marketing Analyzer</h2>
-        <form method="POST">
-            <label for="marketing_text"><strong>Paste your marketing copy or ad text:</strong></label><br><br>
-            <textarea id="marketing_text" name="marketing_text" placeholder="e.g., Our innovative software helps teams collaborate seamlessly and boost productivity effortlessly!" required></textarea>
-            <button type="submit">Analyze Content</button>
-        </form>
 
-        {% if result %}
-        <div class="results">
-            <h3>Analysis Results</h3>
-            <div class="metric"><strong>Word Count:</strong> {{ result.word_count }}</div>
-            <div class="metric"><strong>Sentiment Polarity (-1 to +1):</strong> {{ result.polarity }}</div>
-            <div class="metric"><strong>Subjectivity (0 to 1):</strong> {{ result.subjectivity }}</div>
-            <div class="metric"><strong>Flesch Readability Score:</strong> {{ result.readability }} / 100</div>
+    <h1>Linguistic & Sentiment Analyzer</h1>
+    <p style="text-align: center; color: #6c757d;">Paste your marketing copy below for instant readability and tone feedback.</p>
+
+    <form method="POST">
+        <textarea name="content" placeholder="Type or paste your content here..." required>{{ original_text }}</textarea>
+        <button type="submit">Analyze Copy</button>
+    </form>
+
+    {% if sentiment_label %}
+    <div class="results-box">
+        <h2>Analysis Results</h2>
+        
+        <div class="result-item">
+            <strong>Tone of Your Copy:</strong> {{ sentiment_label }}
+            <div class="tip">{{ sentiment_tip }}</div>
         </div>
-        {% endif %}
+        
+        <hr style="border: 0; border-top: 1px solid #dee2e6;">
+        
+        <div class="result-item">
+            <strong>Reading Ease:</strong> {{ readability_label }}
+            <div class="tip">{{ readability_tip }}</div>
+        </div>
     </div>
-</body>
-</html>
-<!-- Footer Branding -->
-    <footer style="margin-top: 40px; padding: 20px 0; text-align: center; font-size: 0.9rem; color: #6c757d; border-top: 1px solid #e9ecef;">
+    {% endif %}
+
+    <footer>
         <p>Made by <strong>Tamanna Haque</strong> | Linguistic & Sentiment Marketing Content Analyzer</p>
     </footer>
+
 </body>
+</html>
