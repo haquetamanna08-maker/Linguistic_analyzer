@@ -5,41 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marketing Content Analyzer</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #333; }
-        h1 { color: #2c3e50; text-align: center; }
-        textarea { width: 100%; height: 140px; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
-        button { background-color: #007bff; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; margin-top: 10px; width: 100%; }
-        button:hover { background-color: #0056b3; }
-        .results-box { margin-top: 30px; padding: 20px; border-radius: 8px; background-color: #f8f9fa; border: 1px solid #dee2e6; }
-        .result-item { margin-bottom: 15px; }
-        .tip { font-style: italic; color: #6c757d; font-size: 0.95rem; margin-top: 2px; }
-        footer { margin-top: 50px; padding: 20px 0; text-align: center; font-size: 0.9rem; color: #6c757d; border-top: 1px solid #e9ecef; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #1e293b; background-color: #f8fafc; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03); margin-bottom: 25px; border: 1px solid #e2e8f0; }
+        h1 { color: #0f172a; text-align: center; font-size: 1.8rem; margin-top: 0; margin-bottom: 6px; }
+        textarea { width: 100%; height: 140px; padding: 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; font-family: inherit; margin-top: 15px; }
+        textarea:focus { outline: none; border-color: #2563eb; ring: 2px #2563eb; }
+        button { background-color: #2563eb; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600; width: 100%; margin-top: 12px; transition: background 0.2s; }
+        button:hover { background-color: #1d4ed8; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+        .metric-box { background: #f1f5f9; padding: 16px; border-radius: 8px; border-left: 4px solid #2563eb; }
+        .metric-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 700; }
+        .metric-value { font-size: 1.05rem; font-weight: 600; color: #0f172a; margin: 4px 0; }
+        .metric-tip { font-size: 0.9rem; color: #475569; }
+        footer { margin-top: 40px; padding: 20px 0; text-align: center; font-size: 0.9rem; color: #64748b; border-top: 1px solid #e2e8f0; }
     </style>
 </head>
 <body>
 
-    <h1>Linguistic & Sentiment Analyzer</h1>
-    <p style="text-align: center; color: #6c757d;">Paste your marketing copy below for instant readability and tone feedback.</p>
+    <div class="card">
+        <h1>Linguistic & Sentiment Marketing Content Analyzer</h1>
+        <p style="text-align: center; color: #64748b; margin-top: 0;">Evaluate copy clarity, target audience alignment, and emotional tone instantly.</p>
 
-    <form method="POST">
-        <textarea name="content" placeholder="Type or paste your content here..." required>{{ original_text }}</textarea>
-        <button type="submit">Analyze Copy</button>
-    </form>
+        <form method="POST">
+            <textarea name="content" placeholder="Paste your ad copy, email draft, or headline here..." required>{{ original_text }}</textarea>
+            <button type="submit">Analyze Marketing Copy</button>
+        </form>
+    </div>
 
-    {% if sentiment_label %}
-    <div class="results-box">
-        <h2>Analysis Results</h2>
+    {% if results %}
+    <div class="card">
+        <h2 style="margin-top: 0; font-size: 1.3rem; color: #0f172a;">Marketing Intelligence Dashboard</h2>
         
-        <div class="result-item">
-            <strong>Tone of Your Copy:</strong> {{ sentiment_label }}
-            <div class="tip">{{ sentiment_tip }}</div>
-        </div>
-        
-        <hr style="border: 0; border-top: 1px solid #dee2e6;">
-        
-        <div class="result-item">
-            <strong>Reading Ease:</strong> {{ readability_label }}
-            <div class="tip">{{ readability_tip }}</div>
+        <div class="grid">
+            <div class="metric-box">
+                <div class="metric-title">Target Audience & Channel</div>
+                <div class="metric-value">{{ results.audience }}</div>
+                <div class="metric-tip">{{ results.channel_tip }}</div>
+            </div>
+
+            <div class="metric-box">
+                <div class="metric-title">Brand Tone & Emotion</div>
+                <div class="metric-value">{{ results.tone }}</div>
+                <div class="metric-tip">{{ results.tone_tip }}</div>
+            </div>
+
+            <div class="metric-box">
+                <div class="metric-title">Call To Action (CTA)</div>
+                <div class="metric-value">{{ results.cta_feedback }}</div>
+            </div>
+
+            <div class="metric-box">
+                <div class="metric-title">Content Volume</div>
+                <div class="metric-value">{{ results.word_count }} words</div>
+                <div class="metric-tip">Est. reading time: {{ results.reading_time }} min</div>
+            </div>
         </div>
     </div>
     {% endif %}
