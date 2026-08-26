@@ -88,3 +88,20 @@ def analyze_marketing_copy(text, polarity, readability_score):
         'word_count': word_count,
         'reading_time': max(1, round(word_count / 200, 1))
     }
+    @app.route('/', methods=['GET', 'POST'])
+def home():
+    analysis = None
+    text_input = ""
+    
+    if request.method == 'POST':
+        text_input = request.form.get('marketing_text', '')
+        if text_input.strip():
+            blob = TextBlob(text_input)
+            polarity = blob.sentiment.polarity
+            readability_score = textstat.flesch_reading_ease(text_input)
+            analysis = analyze_marketing_copy(text_input, polarity, readability_score)
+            
+    return render_template('index.html', analysis=analysis, text_input=text_input)
+
+if __name__ == '__main__':
+    app.run(debug=True)
