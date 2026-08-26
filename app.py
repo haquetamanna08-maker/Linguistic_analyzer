@@ -88,7 +88,8 @@ def analyze_marketing_copy(text, polarity, readability_score):
         'word_count': word_count,
         'reading_time': max(1, round(word_count / 200, 1))
     }
-    @app.route('/', methods=['GET', 'POST'])
+
+@app.route('/', methods=['GET', 'POST'])
 def home():
     analysis = None
     text_input = ""
