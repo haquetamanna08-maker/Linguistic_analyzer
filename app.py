@@ -1,3 +1,6 @@
+import nltk
+nltk.download('punkt')
+nltk.download('punkt_tab')
 from flask import Flask, render_template, request
 from textblob import TextBlob
 import textstat
