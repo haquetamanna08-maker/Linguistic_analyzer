@@ -2,12 +2,10 @@ from flask import Flask, render_template, request
 from textblob import TextBlob
 import textstat
 import nltk
+from langdetect import detect, DetectorFactory
 
-# Ensure NLTK packages are available in production environments
-try:
-    nltk.download('punkt', quiet=True)
-except Exception:
-    pass
+# Set seed for consistent language detection
+DetectorFactory.seed = 0
 
 app = Flask(__name__)
 
@@ -15,8 +13,25 @@ def analyze_marketing_copy(text, polarity, readability_score):
     words = text.strip().split()
     word_count = len(words)
     text_lower = text.lower()
-    
-    # 1. Edge-case detection: Low context or personal statements (e.g., "I am healthy")
+
+    # 1. Language Detection Check
+    try:
+        lang = detect(text)
+        if lang != 'en':
+            return {
+                'audience': "Unsupported Language 🌐",
+                'channel_tip': "This analyzer currently supports English text only.",
+                'tone': "Language Not Recognized ⚠️",
+                'tone_tip': f"Detected non-English script/language code ('{lang}'). Scores will be inaccurate.",
+                'cta_feedback': "Please input your marketing copy in English.",
+                'word_count': word_count,
+                'reading_time': "< 1 min"
+            }
+    except Exception:
+        # Fallback if text is too short or symbolic for language detection
+        pass
+
+    # 2. Edge-case detection: Short/vague personal statements
     vague_starts = ["i am ", "you are ", "this is ", "it is ", "i feel "]
     is_vague = any(text_lower.startswith(phrase) for phrase in vague_starts) and word_count < 6
 
@@ -26,43 +41,43 @@ def analyze_marketing_copy(text, polarity, readability_score):
             'channel_tip': "This text is too short or personal to evaluate as commercial copy.",
             'tone': "Generic / Personal Statement 😐",
             'tone_tip': "Personal claims describe a state rather than a customer value proposition.",
-            'cta_feedback': "Missing CTA. Convert personal claims into benefits (e.g., 'Discover 5 Secrets to Staying Healthy').",
+            'cta_feedback': "Missing CTA. Convert personal claims into benefits.",
             'word_count': word_count,
             'reading_time': "< 1 min"
         }
 
-    # 2. Target Audience & Channel Recommendations
+    # 3. Target Audience & Channel Recommendations
     if readability_score >= 80:
         audience = "General Public & Social Media (Instagram, TikTok, B2C Ads)"
-        channel_tip = "Highly accessible copy with low cognitive friction. Perfect for quick scrolling."
+        channel_tip = "Highly accessible copy with low cognitive friction."
     elif readability_score >= 60:
         audience = "Mainstream Web Readers (Blogs, Email Newsletters, Landing Pages)"
-        channel_tip = "Balanced readability ideal for standard web campaigns and brand messaging."
+        channel_tip = "Balanced readability ideal for standard web campaigns."
     elif readability_score >= 40:
-        audience = "Professional & Technical (B2B SaaS, In-depth Guides, Product Documentation)"
-        channel_tip = "Suited for informed decision-makers, but simplify if targeting broad consumers."
+        audience = "Professional & Technical (B2B SaaS, In-depth Guides)"
+        channel_tip = "Suited for informed decision-makers."
     else:
         audience = "Niche Experts & Legal/Academic (Whitepapers, Compliance Docs)"
-        channel_tip = "Dense structure. Consider shortening sentences for commercial audience engagement."
+        channel_tip = "Dense structure. Simplify for commercial engagement."
 
-    # 3. Emotional Tone & Strategic Angle
+    # 4. Tone Analysis
     if polarity > 0.4:
         tone = "High Energy & Enthusiastic 🚀"
-        tone_tip = "Great for product launches, special offers, and inspirational brand stories."
+        tone_tip = "Great for product launches and promotional sales."
     elif polarity > 0.05:
         tone = "Warm & Encouraging 🙂"
-        tone_tip = "Excellent for customer onboarding, service descriptions, and building trust."
+        tone_tip = "Excellent for customer onboarding and trust building."
     elif polarity >= -0.05:
         tone = "Objective & Informative 🎯"
-        tone_tip = "Best for feature updates, case studies, and transparent pricing pages."
+        tone_tip = "Best for feature updates and pricing pages."
     else:
         tone = "Problem-Focused / Urgent ⚠️"
-        tone_tip = "Effective for highlighting customer pain points, but follow up quickly with a solution."
+        tone_tip = "Effective for highlighting customer pain points."
 
-    # 4. Actionability & CTA Detection
-    action_words = ['get', 'start', 'buy', 'try', 'join', 'discover', 'learn', 'save', 'claim', 'download', 'subscribe', 'book']
+    # 5. CTA Verification
+    action_words = ['get', 'start', 'buy', 'try', 'join', 'discover', 'learn', 'save', 'claim', 'download']
     has_cta = any(word in text_lower for word in action_words)
-    cta_feedback = "Strong call-to-action detected! 💪" if has_cta else "Consider adding an active CTA verb (e.g., 'Get', 'Start', 'Discover')."
+    cta_feedback = "Strong call-to-action detected! 💪" if has_cta else "Consider adding an active CTA verb."
 
     return {
         'audience': audience,
@@ -73,22 +88,3 @@ def analyze_marketing_copy(text, polarity, readability_score):
         'word_count': word_count,
         'reading_time': max(1, round(word_count / 200, 1))
     }
-
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    results = None
-    original_text = ""
-
-    if request.method == 'POST':
-        original_text = request.form.get('content', '')
-        if original_text.strip():
-            blob = TextBlob(original_text)
-            polarity = blob.sentiment.polarity
-            readability_score = textstat.flesch_reading_ease(original_text)
-
-            results = analyze_marketing_copy(original_text, polarity, readability_score)
-
-    return render_template('index.html', original_text=original_text, results=results)
-
-if __name__ == '__main__':
-    app.run(debug=True)
