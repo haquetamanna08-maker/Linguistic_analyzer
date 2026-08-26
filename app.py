@@ -3,41 +3,80 @@ from textblob import TextBlob
 import textstat
 import nltk
 
-# Ensure NLTK packages are available
-nltk.download('punkt')
+# Ensure NLTK packages are available in production environments
+try:
+    nltk.download('punkt', quiet=True)
+except Exception:
+    pass
 
 app = Flask(__name__)
 
-def get_sentiment_label(polarity):
-    if polarity > 0.5:
-        return "Very Positive 😄", "Great energy! Your copy feels optimistic and upbeat."
-    elif polarity > 0.1:
-        return "Slightly Positive 🙂", "Friendly tone, encouraging for readers."
-    elif polarity >= -0.1:
-        return "Neutral 😐", "Clear and direct tone, perfect for informative or formal copy."
-    elif polarity >= -0.5:
-        return "Slightly Negative 🙁", "A bit cautious or problem-focused."
-    else:
-        return "Very Negative 😟", "Strongly negative tone. Good for highlighting problems, but ensure it balances out."
+def analyze_marketing_copy(text, polarity, readability_score):
+    words = text.strip().split()
+    word_count = len(words)
+    text_lower = text.lower()
+    
+    # 1. Edge-case detection: Low context or personal statements (e.g., "I am healthy")
+    vague_starts = ["i am ", "you are ", "this is ", "it is ", "i feel "]
+    is_vague = any(text_lower.startswith(phrase) for phrase in vague_starts) and word_count < 6
 
-def get_readability_label(score):
-    if score >= 90:
-        return "Very Easy 🟢", "5th Grade Level — Effortless to read for anyone."
-    elif score >= 70:
-        return "Easy 🟢", "7th Grade Level — Clear and conversational for general audiences."
-    elif score >= 60:
-        return "Standard / Balanced 🟡", "8th–9th Grade Level — Ideal for most web content and marketing copy."
-    elif score >= 50:
-        return "Fairly Difficult 🟧", "High School Level — Concise, but contains longer words or sentences."
+    if word_count < 4 or is_vague:
+        return {
+            'audience': "Low Context / Non-Marketing Copy ⚠️",
+            'channel_tip': "This text is too short or personal to evaluate as commercial copy.",
+            'tone': "Generic / Personal Statement 😐",
+            'tone_tip': "Personal claims describe a state rather than a customer value proposition.",
+            'cta_feedback': "Missing CTA. Convert personal claims into benefits (e.g., 'Discover 5 Secrets to Staying Healthy').",
+            'word_count': word_count,
+            'reading_time': "< 1 min"
+        }
+
+    # 2. Target Audience & Channel Recommendations
+    if readability_score >= 80:
+        audience = "General Public & Social Media (Instagram, TikTok, B2C Ads)"
+        channel_tip = "Highly accessible copy with low cognitive friction. Perfect for quick scrolling."
+    elif readability_score >= 60:
+        audience = "Mainstream Web Readers (Blogs, Email Newsletters, Landing Pages)"
+        channel_tip = "Balanced readability ideal for standard web campaigns and brand messaging."
+    elif readability_score >= 40:
+        audience = "Professional & Technical (B2B SaaS, In-depth Guides, Product Documentation)"
+        channel_tip = "Suited for informed decision-makers, but simplify if targeting broad consumers."
     else:
-        return "Complex / Technical 🔴", "College Level — Might feel dense or hard for quick reading."
+        audience = "Niche Experts & Legal/Academic (Whitepapers, Compliance Docs)"
+        channel_tip = "Dense structure. Consider shortening sentences for commercial audience engagement."
+
+    # 3. Emotional Tone & Strategic Angle
+    if polarity > 0.4:
+        tone = "High Energy & Enthusiastic 🚀"
+        tone_tip = "Great for product launches, special offers, and inspirational brand stories."
+    elif polarity > 0.05:
+        tone = "Warm & Encouraging 🙂"
+        tone_tip = "Excellent for customer onboarding, service descriptions, and building trust."
+    elif polarity >= -0.05:
+        tone = "Objective & Informative 🎯"
+        tone_tip = "Best for feature updates, case studies, and transparent pricing pages."
+    else:
+        tone = "Problem-Focused / Urgent ⚠️"
+        tone_tip = "Effective for highlighting customer pain points, but follow up quickly with a solution."
+
+    # 4. Actionability & CTA Detection
+    action_words = ['get', 'start', 'buy', 'try', 'join', 'discover', 'learn', 'save', 'claim', 'download', 'subscribe', 'book']
+    has_cta = any(word in text_lower for word in action_words)
+    cta_feedback = "Strong call-to-action detected! 💪" if has_cta else "Consider adding an active CTA verb (e.g., 'Get', 'Start', 'Discover')."
+
+    return {
+        'audience': audience,
+        'channel_tip': channel_tip,
+        'tone': tone,
+        'tone_tip': tone_tip,
+        'cta_feedback': cta_feedback,
+        'word_count': word_count,
+        'reading_time': max(1, round(word_count / 200, 1))
+    }
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    sentiment_label = None
-    sentiment_tip = None
-    readability_label = None
-    readability_tip = None
+    results = None
     original_text = ""
 
     if request.method == 'POST':
@@ -47,17 +86,9 @@ def index():
             polarity = blob.sentiment.polarity
             readability_score = textstat.flesch_reading_ease(original_text)
 
-            sentiment_label, sentiment_tip = get_sentiment_label(polarity)
-            readability_label, readability_tip = get_readability_label(readability_score)
+            results = analyze_marketing_copy(original_text, polarity, readability_score)
 
-    return render_template(
-        'index.html',
-        original_text=original_text,
-        sentiment_label=sentiment_label,
-        sentiment_tip=sentiment_tip,
-        readability_label=readability_label,
-        readability_tip=readability_tip
-    )
+    return render_template('index.html', original_text=original_text, results=results)
 
 if __name__ == '__main__':
     app.run(debug=True)
