@@ -3,71 +3,300 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketing Content Analyzer</title>
+    <title>Marketing Content Analyzer | Designed by TAMANNA HAQUE</title>
     <style>
-        * { box-sizing: border-box; }
-        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #1e293b; background-color: #f8fafc; }
-        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03); margin-bottom: 25px; border: 1px solid #e2e8f0; }
-        h1 { color: #0f172a; text-align: center; font-size: 1.8rem; margin-top: 0; margin-bottom: 6px; }
-        textarea { width: 100%; height: 140px; padding: 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; font-family: inherit; margin-top: 15px; }
-        textarea:focus { outline: none; border-color: #2563eb; ring: 2px #2563eb; }
-        button { background-color: #2563eb; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600; width: 100%; margin-top: 12px; transition: background 0.2s; }
-        button:hover { background-color: #1d4ed8; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
-        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
-        .metric-box { background: #f1f5f9; padding: 16px; border-radius: 8px; border-left: 4px solid #2563eb; }
-        .metric-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 700; }
-        .metric-value { font-size: 1.05rem; font-weight: 600; color: #0f172a; margin: 4px 0; }
-        .metric-tip { font-size: 0.9rem; color: #475569; }
-        footer { margin-top: 40px; padding: 20px 0; text-align: center; font-size: 0.9rem; color: #64748b; border-top: 1px solid #e2e8f0; }
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --page-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --accent-border: #cbd5e1;
+            --box-bg: #f1f5f9;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--page-bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        header {
+            background: var(--bg-gradient);
+            color: #ffffff;
+            padding: 32px 28px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.2);
+            margin-bottom: 28px;
+        }
+
+        header h1 {
+            font-size: 1.85rem;
+            margin: 0 0 8px 0;
+            font-weight: 700;
+        }
+
+        .author-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.12);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.825rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: #93c5fd;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        header p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            margin-bottom: 24px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 160px;
+            padding: 16px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.2s ease;
+            background-color: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: var(--primary);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .button-group {
+            margin-top: 18px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .results-section-header {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0 0 20px 0;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .result-box {
+            background-color: var(--box-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--accent-border);
+        }
+
+        .result-box.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .result-box h4 {
+            margin: 0 0 8px 0;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .result-box p {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.4;
+        }
+
+        .result-box span {
+            display: block;
+            margin-top: 8px;
+            font-size: 0.875rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .metric-card {
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .metric-card div label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .metric-card div span {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 640px) {
+            .results-grid, .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h1>Linguistic & Sentiment Marketing Content Analyzer</h1>
-        <p style="text-align: center; color: #64748b; margin-top: 0;">Evaluate copy clarity, target audience alignment, and emotional tone instantly.</p>
+<div class="container">
+    <header>
+        <div class="author-badge">Designed by TAMANNA HAQUE</div>
+        <h1>Marketing Content Analyzer</h1>
+        <p>Real-time copy optimization for audience targetability, tone resonance, and CTA performance.</p>
+    </header>
 
-        <form method="POST">
-            <textarea name="content" placeholder="Paste your ad copy, email draft, or headline here..." required>{{ original_text }}</textarea>
-            <button type="submit">Analyze Marketing Copy</button>
+    <div class="card">
+        <form method="POST" action="/">
+            <textarea 
+                name="marketing_text" 
+                placeholder="Paste your marketing copy, email draft, or headline here..." 
+                required>{{ text_input }}</textarea>
+            
+            <div class="button-group">
+                <button type="submit">Analyze Copy</button>
+            </div>
         </form>
     </div>
 
-    {% if results %}
+    {% if analysis %}
     <div class="card">
-        <h2 style="margin-top: 0; font-size: 1.3rem; color: #0f172a;">Marketing Intelligence Dashboard</h2>
+        <div class="results-section-header">
+            📊 Copy Intelligence Breakdown
+        </div>
         
-        <div class="grid">
-            <div class="metric-box">
-                <div class="metric-title">Target Audience & Channel</div>
-                <div class="metric-value">{{ results.audience }}</div>
-                <div class="metric-tip">{{ results.channel_tip }}</div>
+        <div class="results-grid">
+            <div class="result-box">
+                <h4>Target Channel & Audience</h4>
+                <p>{{ analysis.audience }}</p>
+                <span>{{ analysis.channel_tip }}</span>
             </div>
 
-            <div class="metric-box">
-                <div class="metric-title">Brand Tone & Emotion</div>
-                <div class="metric-value">{{ results.tone }}</div>
-                <div class="metric-tip">{{ results.tone_tip }}</div>
+            <div class="result-box">
+                <h4>Tone & Energy Profile</h4>
+                <p>{{ analysis.tone }}</p>
+                <span>{{ analysis.tone_tip }}</span>
             </div>
 
-            <div class="metric-box">
-                <div class="metric-title">Call To Action (CTA)</div>
-                <div class="metric-value">{{ results.cta_feedback }}</div>
+            <div class="result-box full-width">
+                <h4>Call-To-Action (CTA) Verification</h4>
+                <p>{{ analysis.cta_feedback }}</p>
             </div>
 
-            <div class="metric-box">
-                <div class="metric-title">Content Volume</div>
-                <div class="metric-value">{{ results.word_count }} words</div>
-                <div class="metric-tip">Est. reading time: {{ results.reading_time }} min</div>
+            <div class="result-box">
+                <h4>🔍 Spelling & Typo Check</h4>
+                <p style="font-weight: normal; font-size: 0.95rem;">{{ analysis.spelling_feedback | safe }}</p>
+            </div>
+
+            <div class="result-box">
+                <h4>📏 Sentence Length (Target: 10–20 Words)</h4>
+                <p>{{ analysis.sentence_length_feedback }}</p>
+            </div>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div>
+                    <label>Total Word Count</label>
+                    <span>{{ analysis.word_count }} Words</span>
+                </div>
+                <div style="font-size: 1.5rem;">📝</div>
+            </div>
+
+            <div class="metric-card">
+                <div>
+                    <label>Est. Reading Time</label>
+                    <span>{% if analysis.reading_time == '< 1 min' %}&lt; 1 min{% else %}{{ analysis.reading_time }} mins{% endif %}</span>
+                </div>
+                <div style="font-size: 1.5rem;">⏱️</div>
             </div>
         </div>
     </div>
     {% endif %}
 
     <footer>
-        <p>Made by <strong>Tamanna Haque</strong> | Linguistic & Sentiment Marketing Content Analyzer</p>
+        <p><strong>Marketing Content Analyzer</strong> &bull; Designed by <strong>TAMANNA HAQUE</strong></p>
     </footer>
+</div>
 
 </body>
 </html>
