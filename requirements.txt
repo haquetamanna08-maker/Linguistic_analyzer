@@ -4,3 +4,4 @@ textstat
 nltk
 gunicorn
 langdetect
+pyspellchecker
